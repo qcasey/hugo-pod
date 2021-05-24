@@ -1,0 +1,16 @@
+{
+  "name": "hugo-pod",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Quinn Casey",
+  "license": "ISC",
+  "dependencies": {
+    "@dendronhq/pods-core": "^0.42.0",
+    "js-yaml": "^3.14.1"
+  }
+}
