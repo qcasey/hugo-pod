@@ -26,7 +26,7 @@ function replacePortalsWithShortcodes(body) {
 
       // Replace ![[ ]] with a hugo shortcode
       // Quote ref
-      let shortcode = portal.replace("![[", "{{< dendron/portal ").replace("]]", '" >}}').replace("#", ' "'); 
+      let shortcode = portal.replace("![[", '{{< dendron/portal "').replace("]]", '" >}}').replace("#", '" "'); 
       
       //// for hugo replacePortalsWithShortcodes{{ ref }} ?
       //shortcode = dot2Slash(shortcode).replace("#", "/index.md #");
