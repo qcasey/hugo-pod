@@ -17,6 +17,21 @@ function dot2Slash(fname) {
   return fname.replace(/\.(?=[^.]*)/ig, "/");
 } 
 
+function replaceAssetDirs(body) {
+  let assetLinks = body.match(/(!\[.*\]\()assets/ig);
+  
+  if(assetLinks)
+    assetLinks.forEach(link => {
+      console.log(`Replacing link ${link}`);
+
+      // Replace ![.*](assets with the hugo static dir (root)
+      let newLink = link.replace("assets", "");
+
+      body = body.replace(link, newLink);
+    });
+  return body;
+}
+
 function replacePortalsWithShortcodes(body) {
   let portals = body.match(/(!\[\[.+\]\])\s/ig);
   
@@ -92,7 +107,7 @@ class HugoExportPod extends MarkdownExportPod {
         const frontmatter = yaml.dump(fmJson);
 
         // Replace dendron content with hugo shortcodes
-        note.body = replaceRefsWithShortcodes(replacePortalsWithShortcodes(note.body));
+        note.body = replaceAssetDirs(replaceRefsWithShortcodes(replacePortalsWithShortcodes(note.body)));
 
         // Construct index body
         body = await mdPublishPod.plant({ ...opts, note });
@@ -108,8 +123,6 @@ class HugoExportPod extends MarkdownExportPod {
         fpath = !(note.children.length)
           ? fpath + ".md"
           : path.join(fpath, "_index.md");
-
-        console.log(fpath, note.children.length)
 
         // Force root.md to be _index.md of garden
         if(note.fname == "root")
