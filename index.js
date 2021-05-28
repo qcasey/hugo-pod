@@ -22,8 +22,6 @@ function replaceAssetDirs(body) {
   
   if(assetLinks)
     assetLinks.forEach(link => {
-      console.log(`Replacing link ${link}`);
-
       // Replace ![.*](assets with the hugo static dir (root)
       let newLink = link.replace("assets", "");
 
