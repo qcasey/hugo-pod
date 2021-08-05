@@ -10,7 +10,7 @@
   "author": "Quinn Casey",
   "license": "ISC",
   "dependencies": {
-    "@dendronhq/pods-core": "^0.42.0",
+    "@dendronhq/pods-core": "^0.53.0",
     "js-yaml": "^3.14.1"
   }
 }

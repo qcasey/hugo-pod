@@ -1,4 +1,4 @@
-const {  MarkdownExportPod, MarkdownPublishPod } = require("@dendronhq/pods-core");
+const { MarkdownExportPod, MarkdownPublishPod, ExportPod, PodUtils } = require("@dendronhq/pods-core");
 const fs = require('fs-extra');
 const path = require("path");
 const {
@@ -15,12 +15,12 @@ const { DendronASTDest, MDUtilsV4 } = require("@dendronhq/engine-server");
 
 function dot2Slash(fname) {
   return fname.replace(/\.(?=[^.]*)/ig, "/");
-} 
+}
 
 function replaceAssetDirs(body) {
   let assetLinks = body.match(/(!\[.*\]\()assets/ig);
-  
-  if(assetLinks)
+
+  if (assetLinks)
     assetLinks.forEach(link => {
       // Replace ![.*](assets with the hugo static dir (root)
       let newLink = link.replace("assets", "");
@@ -32,15 +32,15 @@ function replaceAssetDirs(body) {
 
 function replacePortalsWithShortcodes(body) {
   let portals = body.match(/(!\[\[.+\]\])\s/ig);
-  
-  if(portals)
+
+  if (portals)
     portals.forEach(portal => {
       //console.log(`Replacing portal ${portal}`);
 
       // Replace ![[ ]] with a hugo shortcode
       // Quote ref
-      let shortcode = portal.replace("![[", '{{< dendron/portal "').replace("]]", '" >}}').replace("#", '" "'); 
-      
+      let shortcode = portal.replace("![[", '{{< dendron/portal "').replace("]]", '" >}}').replace("#", '" "');
+
       //// for hugo replacePortalsWithShortcodes{{ ref }} ?
       //shortcode = dot2Slash(shortcode).replace("#", "/index.md #");
       body = body.replace(portal, shortcode);
@@ -50,8 +50,8 @@ function replacePortalsWithShortcodes(body) {
 
 function replaceRefsWithShortcodes(body) {
   let refs = body.match(/[^!](\[\[[^\[]+\]\])/ig);
-  
-  if(refs)
+
+  if (refs)
     refs.forEach(ref => {
       //console.log(`Replacing ref ${ref}`);
       let shortcode = ref;
@@ -74,22 +74,21 @@ function replaceRefsWithShortcodes(body) {
   return body;
 }
 
-class HugoExportPod extends MarkdownExportPod {
+class HugoExportPod extends ExportPod {
   static id = "hugo";
   static description = "Export markdown, leaving behind frontmatter and portal shortcodes.";
 
   get config() {
-    return super.config.concat([
-      {
-        key: "name",
-        description: "dev.to api key",
-        type: "string",
-      },
-    ]);
+    return PodUtils.createExportConfig({
+      required: ["fname", "vaultName", "includeStubs"],
+      properties: {},
+      additionalProperties: true,
+    });
   }
 
   async plant(opts) {
-    const { dest, notes, engine } = opts;
+    const { dest, notes } = opts;
+
     const ctx = "MarkdownExportPod:plant";
     // verify dest exist
     const podDstPath = dest.fsPath;
@@ -99,7 +98,7 @@ class HugoExportPod extends MarkdownExportPod {
     //this.L.info({ ctx, msg: "pre:iterate_notes" });
     await Promise.all(
       notes.map(async (note) => {
-        let { body, ...fmJson } = {...note};
+        let { body, ...fmJson } = { ...note };
         let d = new Date(fmJson.created);
         fmJson.date = d.toISOString();;
         const frontmatter = yaml.dump(fmJson);
@@ -112,7 +111,7 @@ class HugoExportPod extends MarkdownExportPod {
         body = `---\n${frontmatter}\n---\n\n${body}`;
 
         // Remove "# Title" that was inserted in plant
-        body = body.replace(/\#(.+)/i, "") 
+        body = body.replace(/\#(.+)/i, "")
 
         //const hpath = note.fname + ".md";
         const hpath = dot2Slash(note.fname);
@@ -123,7 +122,7 @@ class HugoExportPod extends MarkdownExportPod {
           : path.join(fpath, "_index.md");
 
         // Force root.md to be _index.md of garden
-        if(note.fname == "root")
+        if (note.fname == "root")
           fpath = path.join(podDstPath, vname, "_index.md");
 
         this.L.info({ ctx, fpath, msg: "pre:write" });
