@@ -100,7 +100,7 @@ class HugoExportPod extends ExportPod {
       notes.map(async (note) => {
         let { body, ...fmJson } = { ...note };
         let d = new Date(fmJson.created);
-        fmJson.date = d.toISOString();;
+        fmJson.date = d.toISOString();
         const frontmatter = yaml.dump(fmJson);
 
         // Replace dendron content with hugo shortcodes
