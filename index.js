@@ -108,10 +108,12 @@ class HugoExportPod extends ExportPod {
 
         // Construct index body
         body = await mdPublishPod.plant({ ...opts, note });
-        body = `---\n${frontmatter}\n---\n\n${body}`;
 
         // Remove "# Title" that was inserted in plant
         body = body.replace(/\#(.+)/i, "")
+
+        // Insert frontmatter
+        body = `---\n${frontmatter}\n---\n\n${body}`;
 
         //const hpath = note.fname + ".md";
         const hpath = dot2Slash(note.fname);
@@ -122,8 +124,8 @@ class HugoExportPod extends ExportPod {
           : path.join(fpath, "_index.md");
 
         // Force root.md to be _index.md of garden
-        if (note.fname == "root")
-          fpath = path.join(podDstPath, vname, "_index.md");
+        // if (note.fname == "root")
+        //   fpath = path.join(podDstPath, vname, "index.md");
 
         this.L.info({ ctx, fpath, msg: "pre:write" });
         await fs.ensureDir(path.dirname(fpath));
