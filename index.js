@@ -101,7 +101,8 @@ class HugoExportPod extends ExportPod {
         let { body, ...fmJson } = { ...note };
         let d = new Date(fmJson.created);
         fmJson.date = d.toISOString();
-        const frontmatter = yaml.dump(fmJson);
+        fmJson = {...fmJson, ...fmJson.custom};
+        const frontmatter = yaml.dump(fmJson, { noRefs: true });
 
         // Replace dendron content with hugo shortcodes
         note.body = replaceAssetDirs(replaceRefsWithShortcodes(replacePortalsWithShortcodes(note.body)));
