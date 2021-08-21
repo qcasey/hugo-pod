@@ -110,8 +110,11 @@ class HugoExportPod extends ExportPod {
         // Construct index body
         body = await mdPublishPod.plant({ ...opts, note });
 
-        // Remove "# Title" that was inserted in plant
+        // Remove "# Title" inserted in plant
         body = body.replace(/\#(.+)/i, "")
+
+        // Remove "## Tags" inserted in plant
+        body = body.replace(/(\#\# Tags\n\n.*\)$)/, "")
 
         // Insert frontmatter
         body = `---\n${frontmatter}\n---\n\n${body}`;
